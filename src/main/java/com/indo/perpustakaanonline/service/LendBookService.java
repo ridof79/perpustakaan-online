@@ -1,5 +1,6 @@
 package com.indo.perpustakaanonline.service;
 
+import com.indo.perpustakaanonline.dto.MemberDTO;
 import com.indo.perpustakaanonline.entity.LendBook;
 import com.indo.perpustakaanonline.entity.Member;
 
@@ -19,7 +20,7 @@ public interface LendBookService {
 
     List<LendBook> findLateLendBooks();
 
-    List<Member> findMembersWhoLendBook();
+    List<MemberDTO> findMembersWhoLendBook();
 
     List<LendBook> findListLendBookByBookId(String bookId);
 }

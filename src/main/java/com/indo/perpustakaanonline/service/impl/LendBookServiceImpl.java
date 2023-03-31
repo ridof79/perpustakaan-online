@@ -1,15 +1,20 @@
 package com.indo.perpustakaanonline.service.impl;
 
+import com.indo.perpustakaanonline.dto.MemberDTO;
+import com.indo.perpustakaanonline.entity.Book;
 import com.indo.perpustakaanonline.entity.LendBook;
 import com.indo.perpustakaanonline.entity.Member;
 import com.indo.perpustakaanonline.repository.LendBookRepository;
+import com.indo.perpustakaanonline.service.BookService;
 import com.indo.perpustakaanonline.service.LendBookService;
+import com.indo.perpustakaanonline.service.MemberService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,6 +22,8 @@ import java.util.stream.Collectors;
 public class LendBookServiceImpl implements LendBookService {
 
     LendBookRepository  lendBookRepository;
+    BookService bookService;
+    MemberService memberService;
 
     @Override
     public List<LendBook> getAllLendBook() {
@@ -29,8 +36,35 @@ public class LendBookServiceImpl implements LendBookService {
     }
 
     @Override
+    @Transactional
     public LendBook saveLendBook(LendBook lendBook) {
-        return lendBookRepository.save(lendBook);
+
+        List<Book> books = lendBook.getBooks()
+                .stream()
+                .map(Book::getId)
+                .toList()
+                .stream()
+                .map(book -> bookService.getBookById(book))
+                .toList();
+
+        for (Book book : books) {
+            if (book.getStock() == 0) {
+                throw new RuntimeException(String.format("Book %s Out of Stock", book.getTitle()));
+            } else {
+                book.setStock(book.getStock() - 1);
+                bookService.saveBook(book);
+            }
+        }
+
+        LendBook savedLendBook = new LendBook(
+                null,
+                books,
+                memberService.getMemberById(lendBook.getMember().getId()),
+                Date.valueOf(LocalDate.now()),
+                lendBook.getReturnDate(),
+                false
+        );
+        return lendBookRepository.save(savedLendBook);
     }
 
     @Override
@@ -72,8 +106,18 @@ public class LendBookServiceImpl implements LendBookService {
     }
 
     @Override
-    public List<Member> findMembersWhoLendBook() {
-        return lendBookRepository.findMembersWithLendBooks();
+    public List<MemberDTO> findMembersWhoLendBook() {
+        List<Member> members = new ArrayList<>();
+        List<Object[]> rows = lendBookRepository.findMembersWithLendBooks();
+        for (Object[] row : rows) {
+            Member member = new Member();
+            member.setId((String) row[0]);
+            member.setName((String) row[1]);
+            member.setAddress((String) row[2]);
+            members.add(member);
+        }
+
+        return members.stream().map(MemberDTO::new).collect(Collectors.toList());
     }
 
     @Override

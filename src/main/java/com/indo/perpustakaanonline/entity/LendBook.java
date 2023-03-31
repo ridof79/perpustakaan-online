@@ -24,7 +24,7 @@ public class LendBook {
     private String id;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "trx_lend_book",
+    @JoinTable(name = "trx_lend_book_list",
             joinColumns = @JoinColumn(name = "lend_book_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> books;
