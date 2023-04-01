@@ -23,7 +23,7 @@ public class LendBook {
     @GenericGenerator(name = "UUID",strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "trx_lend_book_list",
             joinColumns = @JoinColumn(name = "lend_book_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id"))

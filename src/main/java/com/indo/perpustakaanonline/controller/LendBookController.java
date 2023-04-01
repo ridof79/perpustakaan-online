@@ -5,7 +5,6 @@ import com.indo.perpustakaanonline.entity.LendBook;
 import com.indo.perpustakaanonline.entity.Member;
 import com.indo.perpustakaanonline.service.LendBookService;
 import lombok.AllArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -49,9 +48,9 @@ public class LendBookController {
     }
 
     @GetMapping("/member-most-lend-books")
-    public Member findMemberWithMostLendBooksByDate(@RequestParam("start-date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-                                                    @RequestParam("end-date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        return lendBookService.findMemberWithMostLendBooksByDate(startDate, endDate);
+    public Member findMemberWithMostLendBooksByDate(@RequestParam String startDate,
+                                                    @RequestParam String endDate) {
+        return lendBookService.findMemberWithMostLendBooksByDate(Date.valueOf(startDate), Date.valueOf(endDate));
     }
 
     @GetMapping("/late-lend-books")

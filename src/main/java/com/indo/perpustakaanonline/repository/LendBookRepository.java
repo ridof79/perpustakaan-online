@@ -28,7 +28,7 @@ public interface LendBookRepository extends JpaRepository<LendBook, String> {
     List<Object[]> findMembersWithLendBooks();
 
     @Query(
-            value = "SELECT lb.* FROM trx_lend_book lb INNER JOIN book_lend_book blb ON lb.id = blb.lend_book_id WHERE blb.book_id = :bookId",
+            value = "SELECT lb.* FROM trx_lend_book lb INNER JOIN trx_lend_book_list lbl ON lb.id = lbl.lend_book_id WHERE lbl.book_id = :bookId",
             nativeQuery = true)
     List<LendBook> findListLendByBookId(String bookId);
 }
